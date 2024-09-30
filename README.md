@@ -1,4 +1,4 @@
-#JUMIA-Ecommerce-API
+#Powertrain
 
 This product is built with Nodejs, Typescript, MongoDb and mongoose.
 It serves data about more than 30000 startups.
