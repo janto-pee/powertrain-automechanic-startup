@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+// datasource db {
+//   provider = "sqlite"
+//   url      = env("DATABASE_URL")
+// }
+
+// schema.prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  String    @id @default(uuid())
+  email               String    @unique
+  username            String    @unique
+  hashed_password     String?
+  first_name          String?
+  last_name           String?
+  address             String?
+  address2            String
+  city                String?
+  country             String?
+  verificationCode    String?
+  passwordResetCode   String?
+  is_email_verified   Boolean?  @default(false)
+  password_changed_at DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime? @updatedAt
+  Session             Session[]
+}
+
+model Session {
+  id        String    @id @default(uuid())
+  user      User      @relation(fields: [username], references: [username])
+  username  String    @unique
+  userAgent String
+  valid     Boolean
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+// model Post {
+//   id        Int     @id @default(autoincrement())
+//   title     String
+//   content   String?
+//   published Boolean @default(false)
+//   author    User    @relation(fields: [authorId], references: [id])
+//   authorId  Int
+// }
