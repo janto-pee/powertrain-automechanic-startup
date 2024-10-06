@@ -8,7 +8,7 @@ import {
   verifyUserService,
 } from "../service/UserService";
 import { createUserInput } from "../schema/UserSchema";
-import { nanoid } from "nanoid";
+import { v4 } from "uuid";
 import sendEmail from "../utils/sendEmail";
 
 export async function CreateUserHandler(
@@ -17,7 +17,7 @@ export async function CreateUserHandler(
 ) {
   try {
     const body = req.body;
-    const verification = nanoid();
+    const verification = v4();
     const user = await createUserService({
       ...body,
       verificationCode: verification,
@@ -27,13 +27,14 @@ export async function CreateUserHandler(
       to: user.email,
       subject: "Kindly verify your email ✔",
       // text: `verification code: ${user.verificationCode}. username: ${user.username}`,
-      text: `click on the link http://localhost:1337/${user.username}/${user.verificationCode}`,
+      text: `click on the link http://localhost:1337/api/users/verify/${user.username}/${user.verificationCode}`,
       html: "<b>Hello world?</b>",
     });
 
     res.status(201).json({
       status: true,
-      message: "User Successfully Created",
+      message: `User Successfully Created http://localhost:1337/api/users/verify/${user.username}/${user.verificationCode}`,
+      // message: "User Successfully Created",
       data: user,
     });
   } catch (error) {
@@ -50,22 +51,23 @@ export async function verifyUserHandler(req: Request, res: Response) {
     const { username, verificationcode } = req.params;
     const user = await findUserService(username);
     if (!user) {
-      return res.send("could not find user");
+      res.send("could not find user");
+      return;
     }
     if (user.is_email_verified) {
-      return res.send("user already verified");
+      res.send("user already verified");
+      return;
     }
-
+    console;
     if (user.verificationCode === verificationcode) {
-      await verifyUserService(username, {
-        is_email_verified: true,
-      });
+      await verifyUserService(username);
 
-      return res.status(201).send("user successfully verified");
+      res.status(201).send("user successfully verified");
+      return;
     }
     res.status(201).json({
       status: true,
-      message: "User Successfully Created",
+      message: "User now verified",
       data: user,
     });
   } catch (error) {
@@ -82,26 +84,31 @@ export async function forgotPasswordHandler(req: Request, res: Response) {
     const { email } = req.body;
     const user = await findEmailService(email);
     if (!user) {
-      return res.send("could not find user");
+      res.send("could not find user");
+      return;
     }
     if (user.is_email_verified) {
-      return res.send("user already verified");
+      res.send("user already verified");
+      return;
     }
-    const pRC = nanoid();
-    forgotUserService(email, pRC);
+    const pRC = v4();
+    forgotUserService(email, {
+      passwordResetCode: pRC,
+    });
     await sendEmail({
       from: `"Jobby Recruitment Platform 👻" <lakabosch@gmail.com>`,
       to: user.email,
       subject: "Kindly verify your email ✔",
       // text: `verification code: ${user.verificationCode}. username: ${user.username}`,
-      text: `click on the link http://localhost:1337/${user.username}/${pRC}`,
+      text: `click on the link http://localhost:1337/api/users/forgot-password/${user.username}/${pRC}`,
       html: "<b>Hello world?</b>",
     });
 
     // console.log
     res.status(201).json({
       status: true,
-      message: "User Successfully Created",
+      message: `please check your email to reset password http://localhost:1337/api/users/forgot-password/${user.username}/${pRC}`,
+      // message: "please check your email to reset password",
       data: user,
     });
   } catch (error) {
@@ -123,7 +130,8 @@ export async function passwordResetHandler(req: Request, res: Response) {
       !user.passwordResetCode ||
       user.passwordResetCode !== passwordresetcode
     ) {
-      return res.sendStatus(400);
+      res.sendStatus(400);
+      return;
     }
     passwordResetService(username, {
       passwordresetcode: null,

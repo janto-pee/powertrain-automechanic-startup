@@ -18,7 +18,7 @@ export async function findUserService(query: string) {
 }
 
 export async function findEmailService(query: string) {
-  const user = await prisma.user.findUnique({
+  const user = await prisma.user.findFirst({
     where: {
       email: query,
     },
@@ -45,7 +45,7 @@ export async function deleteUserService(query: any) {
   return deleteUser;
 }
 
-export async function verifyUserService(query: string, update: any) {
+export async function verifyUserService(query: string) {
   const updateUser = await prisma.user.update({
     where: {
       username: query,
@@ -60,11 +60,9 @@ export async function verifyUserService(query: string, update: any) {
 export async function forgotUserService(query: string, update: any) {
   const updateUser = await prisma.user.update({
     where: {
-      username: query,
+      email: query,
     },
-    data: {
-      is_email_verified: true,
-    },
+    data: update,
   });
   return updateUser;
 }

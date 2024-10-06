@@ -1,13 +1,13 @@
 import express from "express";
 import config from "config";
 import router from "./prisma/router/routes";
-import bodyParser from "body-parser";
+// import deserializeUser from "./prisma/middleware/deserializeUser";
 
 const app = express();
 
 app.use(express.json());
 app.use(router);
-// app.use(bodyParser.json());
+// app.use(deserializeUser);
 
 const port = config.get<number>("port");
 app.listen(port, () => {
