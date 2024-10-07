@@ -7,6 +7,10 @@ export function signJwt(
   options?: jwt.SignOptions | undefined
 ) {
   try {
+    // const signInKey = Buffer.from(
+    //   config.get<string>(privateKey),
+    //   "base64"
+    // ).toString("ascii");
     const signInKey = config.get<string>(privateKey);
     return jwt.sign(object, signInKey, {
       ...(options && options),

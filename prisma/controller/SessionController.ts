@@ -14,14 +14,15 @@ export async function CreateSessionHandler(req: Request, res: Response) {
     const user = await validateUser(email, password);
 
     if (!user) {
-      res.status(400).send(`user not found`);
+      res.status(400).send(`email or password incorrect`);
       return;
     }
 
     const userAgent = req.get("userAgent") || "";
     const session = await createSession({
-      user: user.username,
+      username: user.username,
       userAgent: userAgent,
+      valid: true,
     });
 
     //   generate access and refresh token
@@ -36,7 +37,6 @@ export async function CreateSessionHandler(req: Request, res: Response) {
       "refreshTokenPrivate",
       { expiresIn: config.get<string>("refreshTokenTtl") }
     );
-    console.log(res.locals);
 
     res.status(200).send({
       session,

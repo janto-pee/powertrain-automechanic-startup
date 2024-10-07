@@ -96,7 +96,7 @@ export async function validateUser(email: string, password: string) {
 
   if (!user || user.hashed_password === null) return false;
 
-  const match = await comparePassword(user.hashed_password, password);
+  const match = await comparePassword(password, user.hashed_password);
 
   if (match) {
     return user;

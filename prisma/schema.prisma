@@ -38,9 +38,9 @@ model User {
 
 model Session {
   id        String    @id @default(uuid())
-  user      User      @relation(fields: [username], references: [username])
-  username  String    @unique
-  userAgent String
+  user      User      @relation(fields: [username], references: [username], onDelete: Cascade)
+  username  String
+  userAgent String?
   valid     Boolean
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
