@@ -87,29 +87,26 @@ export async function forgotPasswordHandler(req: Request, res: Response) {
       res.send("could not find user");
       return;
     }
-    if (user.is_email_verified) {
-      res.send("user already verified");
+    if (!user.is_email_verified) {
+      res.send("please verify first");
       return;
     }
     const pRC = v4();
-    forgotUserService(email, {
-      passwordResetCode: pRC,
-    });
+    const updatedUser = await forgotUserService(email, pRC);
     await sendEmail({
       from: `"Jobby Recruitment Platform 👻" <lakabosch@gmail.com>`,
       to: user.email,
       subject: "Kindly verify your email ✔",
       // text: `verification code: ${user.verificationCode}. username: ${user.username}`,
-      text: `click on the link http://localhost:1337/api/users/forgot-password/${user.username}/${pRC}`,
+      text: `click on the link http://localhost:1337/api/users/passwordreset/${updatedUser.username}/${pRC}`,
       html: "<b>Hello world?</b>",
     });
 
     // console.log
     res.status(201).json({
       status: true,
-      message: `please check your email to reset password http://localhost:1337/api/users/forgot-password/${user.username}/${pRC}`,
-      // message: "please check your email to reset password",
-      data: user,
+      message: `please check your email to reset password http://localhost:1337/api/users/passwordreset/${updatedUser.username}/${pRC}`,
+      data: updatedUser,
     });
   } catch (error) {
     console.log(error);
@@ -133,14 +130,12 @@ export async function passwordResetHandler(req: Request, res: Response) {
       res.sendStatus(400);
       return;
     }
-    passwordResetService(username, {
-      passwordresetcode: null,
-      password: password,
-    });
+    const updatedUser = await passwordResetService(username, password);
+    console.log("debugging ... - ", updatedUser.hashed_password, password);
     res.status(201).json({
       status: true,
-      message: "User Successfully Created",
-      data: user,
+      message: "password changed successfully",
+      data: updatedUser,
     });
   } catch (error) {
     console.log(error);

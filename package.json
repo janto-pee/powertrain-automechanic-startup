@@ -41,6 +41,7 @@
     "dayjs": "^1.11.13",
     "express": "^4.21.0",
     "jsonwebtoken": "^9.0.2",
+    "lodash": "^4.17.21",
     "nanoid": "^5.0.7",
     "nodemailer": "^6.9.15",
     "pg": "^8.13.0",

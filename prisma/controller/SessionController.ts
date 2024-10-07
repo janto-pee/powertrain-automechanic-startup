@@ -10,10 +10,12 @@ import config from "config";
 
 export async function CreateSessionHandler(req: Request, res: Response) {
   try {
-    const user = await validateUser(req.body);
+    const { email, password } = req.body;
+    const user = await validateUser(email, password);
 
     if (!user) {
-      return res.status(400).send(`user not found`);
+      res.status(400).send(`user not found`);
+      return;
     }
 
     const userAgent = req.get("userAgent") || "";
@@ -36,11 +38,12 @@ export async function CreateSessionHandler(req: Request, res: Response) {
     );
     console.log(res.locals);
 
-    return res.status(200).send({
+    res.status(200).send({
       session,
       accessToken: accessToken,
       refreshToken: refreshToken,
     });
+    return;
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -53,7 +56,7 @@ export async function CreateSessionHandler(req: Request, res: Response) {
 export async function findSessionHandler(req: Request, res: Response) {
   try {
     const username = res.locals.user.username;
-    const session = await findSession({ user: username, valid: true });
+    const session = await findSession(username);
     res.status(201).json({
       status: true,
       message: "session found",
@@ -72,7 +75,7 @@ export async function findSessionHandler(req: Request, res: Response) {
 export async function deleteSessionHandler(req: Request, res: Response) {
   try {
     const username = res.locals.user.username;
-    const user = await updateSession(username, { valid: false });
+    const user = await updateSession(username);
     res.status(201).json({
       status: true,
       message: "session expired",

@@ -14,26 +14,28 @@ export async function createSession(input: any) {
 export async function findSession(query: any) {
   const session = await prisma.session.findUnique({
     where: {
-      id: query,
+      username: query,
+      valid: true,
     },
   });
   return session;
 }
-export async function updateSession(query: string, update: any) {
+
+export async function updateSession(query: string) {
   const updateUser = await prisma.session.update({
     where: {
       username: query,
+      valid: true,
     },
-    data: update,
+    data: {
+      username: query,
+      valid: false,
+    },
   });
   return updateUser;
 }
 
-export async function reIssueAccessToken({
-  refreshToken,
-}: {
-  refreshToken: string;
-}) {
+export async function reIssueAccessToken(refreshToken: string) {
   const { decoded } = verifyJwt(refreshToken, "refreshTokenPublic");
 
   if (!decoded || !get(decoded, "session")) return false;

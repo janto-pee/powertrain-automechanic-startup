@@ -24,17 +24,17 @@ const deserializeUser = async (
     return;
   }
 
-  if (expired && refreshToken) {
-    const newAccessToken = await reIssueAccessToken({ refreshToken });
+  // if (expired && refreshToken) {
+  //   const newAccessToken = await reIssueAccessToken(refreshToken);
 
-    if (newAccessToken) {
-      res.setHeader("x-access-token", newAccessToken);
-    }
-    const result = verifyJwt(newAccessToken as string, "accessTokenPublic");
-    res.locals.user = result.decoded;
+  //   if (newAccessToken) {
+  //     res.setHeader("x-access-token", newAccessToken);
+  //   }
+  //   const result = verifyJwt(newAccessToken as string, "accessTokenPublic");
+  //   res.locals.user = result.decoded;
 
-    return next();
-  }
+  //   return next();
+  // }
   return next();
 };
 

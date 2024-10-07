@@ -1,7 +1,7 @@
 export default {
   port: 1337,
   logLevel: "info",
-  saltWorkFactor: 8,
+  saltWorkFactor: 10,
   accessTokenPrivate: "",
   refreshTokenPrivate: "",
   smtp: {
