@@ -12,7 +12,7 @@ export async function createSession(input: any) {
 }
 
 export async function findSession(query: any) {
-  const session = await prisma.session.findUnique({
+  const session = await prisma.session.findFirst({
     where: {
       username: query,
       valid: true,
@@ -22,7 +22,7 @@ export async function findSession(query: any) {
 }
 
 export async function updateSession(query: string) {
-  const updateUser = await prisma.session.update({
+  const updateUser = await prisma.session.updateMany({
     where: {
       username: query,
       valid: true,

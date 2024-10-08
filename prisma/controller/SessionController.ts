@@ -12,6 +12,7 @@ export async function CreateSessionHandler(req: Request, res: Response) {
   try {
     const { email, password } = req.body;
     const user = await validateUser(email, password);
+    console.log(user);
 
     if (!user) {
       res.status(400).send(`user not found`);
@@ -22,6 +23,7 @@ export async function CreateSessionHandler(req: Request, res: Response) {
     const session = await createSession({
       user: user.username,
       userAgent: userAgent,
+      valid: true,
     });
 
     //   generate access and refresh token

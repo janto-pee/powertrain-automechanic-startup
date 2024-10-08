@@ -12,5 +12,9 @@ export async function comparePassword(
   confirm_password: string,
   password: string
 ) {
-  return bcrypt.compare(confirm_password, password).catch((e) => false);
+  const check = await bcrypt
+    .compare(confirm_password, password)
+    .catch((e) => false);
+  console.log(check);
+  return check;
 }
