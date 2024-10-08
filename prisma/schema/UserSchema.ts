@@ -1,65 +1,82 @@
 import { object, string, TypeOf } from "zod";
 
-const createUserSchema = object({
-  body: object({
-    email: string({ required_error: `email is required` }).email(
-      "must be a valid email"
-    ),
-    username: string({ required_error: `the field name is required` }),
-    first_name: string({ required_error: `the field name is required` }),
-    address: string({ required_error: `the field name is required` }),
-    address2: string({ required_error: `the field name is required` }),
-    city: string({ required_error: `the field name is required` }),
-    country: string({ required_error: `the field name is required` }),
-    verificationCode: string({ required_error: `the field name is required` }),
-    last_name: string({ required_error: `the field name is required` }),
-    hashed_password: string({ required_error: `password is required` }).min(
-      8,
-      `password must be 8 characters long`
-    ),
-    confirm_password: string({
-      required_error: `confirm_password is required`,
-    }),
-  }).refine((data) => data.hashed_password === data.confirm_password, {
+const userInput = object({
+  email: string({ required_error: `email is required` }).email(
+    "must be a valid email"
+  ),
+  username: string({ required_error: `the field name is required` }),
+  first_name: string({ required_error: `the field name is required` }),
+  address: string({ required_error: `the field name is required` }),
+  address2: string({ required_error: `the field name is required` }),
+  city: string({ required_error: `the field name is required` }),
+  country: string({ required_error: `the field name is required` }),
+  verificationCode: string({ required_error: `the field name is required` }),
+  last_name: string({ required_error: `the field name is required` }),
+  hashed_password: string({ required_error: `password is required` }).min(
+    8,
+    `password must be 8 characters long`
+  ),
+  confirm_password: string({
+    required_error: `confirm_password is required`,
+  }),
+});
+
+export const createUserSchema = object({
+  body: userInput.refine(
+    (data) => data.hashed_password === data.confirm_password,
+    {
+      message: `password and confirm_password mismatch`,
+      path: ["confirm_password"],
+    }
+  ),
+});
+
+const verifyParams = object({
+  id: string({ required_error: `the field name is required` }),
+  verificationcode: string({ required_error: `the field name is required` }),
+});
+
+export const verifyUserSchema = object({
+  params: verifyParams,
+});
+
+const forgotBody = object({
+  email: string({ required_error: `email is required` }).email(
+    "must be a valid email"
+  ),
+});
+export const forgotPasswordSchema = object({
+  body: forgotBody,
+});
+
+const resetParams = object({
+  id: string({ required_error: `the field name is required` }),
+  passwordresetcode: string({ required_error: `the field name is required` }),
+});
+
+const resetBody = object({
+  password: string({ required_error: `password is required` }).min(
+    8,
+    `password must be 8 characters long`
+  ),
+  confirm_password: string({
+    required_error: `confirm_password is required`,
+  }),
+});
+
+export const resetPasswordSchema = object({
+  params: resetParams,
+  body: resetBody.refine((data) => data.password === data.confirm_password, {
     message: `password and confirm_password mismatch`,
     path: ["confirm_password"],
   }),
 });
 
-const verifyUserSchema = object({
-  params: object({
-    username: string({ required_error: `the field name is required` }),
-    verificationcode: string({ required_error: `the field name is required` }),
-  }),
-});
-
-const forgotPasswordSchema = object({
-  body: object({
-    email: string({ required_error: `email is required` }).email(
-      "must be a valid email"
-    ),
-  }),
-});
-
-const resetPasswordSchema = object({
-  params: object({
-    username: string({ required_error: `the field name is required` }),
-    passwordResetCode: string({ required_error: `the field name is required` }),
-  }),
-  body: object({
-    hashed_password: string({ required_error: `password is required` }).min(
-      8,
-      `password must be 8 characters long`
-    ),
-    confirm_password: string({
-      required_error: `confirm_password is required`,
-    }),
-  }).refine((data) => data.hashed_password === data.confirm_password, {
-    message: `password and confirm_password mismatch`,
-    path: ["confirm_password"],
-  }),
-});
-export default createUserSchema;
+export type userInput = TypeOf<typeof userInput>;
+export type verifyParam = TypeOf<typeof verifyParams>;
+export type forgotBody = TypeOf<typeof forgotBody>;
+export type resetParam = TypeOf<typeof resetParams>;
+export type resetBody = TypeOf<typeof resetBody>;
 
 export type createUserInput = TypeOf<typeof createUserSchema>;
 export type verifyUserInput = TypeOf<typeof verifyUserSchema>;

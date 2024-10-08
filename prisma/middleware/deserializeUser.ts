@@ -12,29 +12,29 @@ const deserializeUser = async (
     /^Bearer\s/,
     ""
   );
-  const refreshToken = get(req, "headers.x-refresh");
+
   if (!accessToken) {
     return next();
   }
 
   const { decoded, expired } = verifyJwt(accessToken, "accessTokenPublic");
 
-  if (!decoded) {
-    res.status(500).send("invalid token");
-    return;
+  if (decoded) {
+    res.locals.user = decoded;
   }
+  const refreshToken = get(req, "headers.x-refresh") as string;
 
-  // if (expired && refreshToken) {
-  //   const newAccessToken = await reIssueAccessToken(refreshToken);
+  if (expired && refreshToken) {
+    const newAccessToken = await reIssueAccessToken(refreshToken);
 
-  //   if (newAccessToken) {
-  //     res.setHeader("x-access-token", newAccessToken);
-  //   }
-  //   const result = verifyJwt(newAccessToken as string, "accessTokenPublic");
-  //   res.locals.user = result.decoded;
+    if (newAccessToken) {
+      res.setHeader("x-access-token", newAccessToken as string);
+    }
+    const result = verifyJwt(newAccessToken as string, "accessTokenPublic");
+    res.locals.user = result.decoded;
 
-  //   return next();
-  // }
+    return next();
+  }
   return next();
 };
 

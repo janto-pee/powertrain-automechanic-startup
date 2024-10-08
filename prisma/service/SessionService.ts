@@ -11,24 +11,22 @@ export async function createSession(input: any) {
   return session;
 }
 
-export async function findSession(query: any) {
-  const session = await prisma.session.findFirst({
+export async function findSession(query: string) {
+  const session = await prisma.session.findUnique({
     where: {
-      username: query,
-      valid: true,
+      id: query,
     },
   });
   return session;
 }
 
 export async function updateSession(query: string) {
-  const updateUser = await prisma.session.updateMany({
+  const updateUser = await prisma.session.update({
     where: {
-      username: query,
+      id: query,
       valid: true,
     },
     data: {
-      username: query,
       valid: false,
     },
   });
@@ -40,11 +38,11 @@ export async function reIssueAccessToken(refreshToken: string) {
 
   if (!decoded || !get(decoded, "session")) return false;
 
-  const session = await findSession(!get(decoded, "session"));
+  const session = await findSession(get(decoded, "session"));
 
   if (!session || !session.valid) return false;
 
-  const user = await findUserService(session.username);
+  const user = await findUserService(session.userId);
 
   if (!user) return false;
 

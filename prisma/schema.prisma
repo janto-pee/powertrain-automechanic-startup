@@ -38,8 +38,8 @@ model User {
 
 model Session {
   id        String    @id @default(uuid())
-  user      User      @relation(fields: [username], references: [username])
-  username  String    @unique
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String
   userAgent String
   valid     Boolean
   createdAt DateTime  @default(now())

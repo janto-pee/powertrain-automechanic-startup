@@ -15,6 +15,12 @@ const transporter = nodemailer.createTransport({
   auth: { user: smtp.user, pass: smtp.pass },
 });
 
+// async function createTestCred() {
+//   const cred = await nodemailer.createTestAccount();
+//   console.log("cred.... - ", { cred });
+// }
+
+// createTestCred();
 async function sendEmail(payload: SendMailOptions) {
   transporter.sendMail(payload, (err, info) => {
     if (err) {

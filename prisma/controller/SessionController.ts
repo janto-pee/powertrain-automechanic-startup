@@ -7,11 +7,15 @@ import {
 } from "../service/SessionService";
 import { signJwt } from "../utils/jwt";
 import config from "config";
+import { createSessionInput } from "../schema/SessionSchema";
 
-export async function CreateSessionHandler(req: Request, res: Response) {
+export async function CreateSessionHandler(
+  req: Request<{}, {}, createSessionInput["body"]>,
+  res: Response
+) {
   try {
-    const { email, password } = req.body;
-    const user = await validateUser(email, password);
+    const { email, hashed_password } = req.body;
+    const user = await validateUser(email, hashed_password);
     console.log(user);
 
     if (!user) {
@@ -21,7 +25,7 @@ export async function CreateSessionHandler(req: Request, res: Response) {
 
     const userAgent = req.get("userAgent") || "";
     const session = await createSession({
-      user: user.username,
+      userId: user.id,
       userAgent: userAgent,
       valid: true,
     });
@@ -38,7 +42,6 @@ export async function CreateSessionHandler(req: Request, res: Response) {
       "refreshTokenPrivate",
       { expiresIn: config.get<string>("refreshTokenTtl") }
     );
-    console.log(res.locals);
 
     res.status(200).send({
       session,
@@ -57,8 +60,8 @@ export async function CreateSessionHandler(req: Request, res: Response) {
 
 export async function findSessionHandler(req: Request, res: Response) {
   try {
-    const username = res.locals.user.username;
-    const session = await findSession(username);
+    const id = res.locals.user.session;
+    const session = await findSession(id);
     res.status(201).json({
       status: true,
       message: "session found",
@@ -76,8 +79,8 @@ export async function findSessionHandler(req: Request, res: Response) {
 
 export async function deleteSessionHandler(req: Request, res: Response) {
   try {
-    const username = res.locals.user.username;
-    const user = await updateSession(username);
+    const id = res.locals.user.id;
+    const user = await updateSession(id);
     res.status(201).json({
       status: true,
       message: "session expired",

@@ -7,7 +7,14 @@ import {
   passwordResetService,
   verifyUserService,
 } from "../service/UserService";
-import { createUserInput } from "../schema/UserSchema";
+import {
+  createUserInput,
+  forgotBody,
+  forgotPasswordInput,
+  resetPasswordInput,
+  verifyParam,
+  verifyUserInput,
+} from "../schema/UserSchema";
 import { v4 } from "uuid";
 import sendEmail from "../utils/sendEmail";
 
@@ -26,15 +33,13 @@ export async function CreateUserHandler(
       from: `"Jobby Recruitment Platform 👻" <lakabosch@gmail.com>`,
       to: user.email,
       subject: "Kindly verify your email ✔",
-      // text: `verification code: ${user.verificationCode}. username: ${user.username}`,
-      text: `click on the link http://localhost:1337/api/users/verify/${user.username}/${user.verificationCode}`,
-      html: "<b>Hello world?</b>",
+      text: `click on the link http://localhost:1337/api/users/verify/${user.id}/${user.verificationCode}`,
+      html: `<b>Hello, click on the link http://localhost:1337/api/users/verify/${user.id}/${user.verificationCode}</b>`,
     });
 
     res.status(201).json({
       status: true,
-      message: `User Successfully Created http://localhost:1337/api/users/verify/${user.username}/${user.verificationCode}`,
-      // message: "User Successfully Created",
+      message: `User Successfully Created http://localhost:1337/api/users/verify/${user.id}/${user.verificationCode}`,
       data: user,
     });
   } catch (error) {
@@ -46,10 +51,14 @@ export async function CreateUserHandler(
   }
 }
 
-export async function verifyUserHandler(req: Request, res: Response) {
+export async function verifyUserHandler(
+  req: Request<verifyUserInput["params"]>,
+  res: Response
+) {
   try {
-    const { username, verificationcode } = req.params;
-    const user = await findUserService(username);
+    const { id, verificationcode } = req.params;
+    console.log(id);
+    const user = await findUserService(id);
     if (!user) {
       res.send("could not find user");
       return;
@@ -58,9 +67,9 @@ export async function verifyUserHandler(req: Request, res: Response) {
       res.send("user already verified");
       return;
     }
-    console;
+
     if (user.verificationCode === verificationcode) {
-      await verifyUserService(username);
+      await verifyUserService(id);
 
       res.status(201).send("user successfully verified");
       return;
@@ -68,7 +77,6 @@ export async function verifyUserHandler(req: Request, res: Response) {
     res.status(201).json({
       status: true,
       message: "User now verified",
-      data: user,
     });
   } catch (error) {
     console.log(error);
@@ -79,7 +87,10 @@ export async function verifyUserHandler(req: Request, res: Response) {
   }
 }
 
-export async function forgotPasswordHandler(req: Request, res: Response) {
+export async function forgotPasswordHandler(
+  req: Request<{}, {}, forgotPasswordInput["body"]>,
+  res: Response
+) {
   try {
     const { email } = req.body;
     const user = await findEmailService(email);
@@ -98,15 +109,14 @@ export async function forgotPasswordHandler(req: Request, res: Response) {
       to: user.email,
       subject: "Kindly verify your email ✔",
       // text: `verification code: ${user.verificationCode}. username: ${user.username}`,
-      text: `click on the link http://localhost:1337/api/users/passwordreset/${updatedUser.username}/${pRC}`,
+      text: `click on the link http://localhost:1337/api/users/passwordreset/${updatedUser.id}/${pRC}`,
       html: "<b>Hello world?</b>",
     });
 
     // console.log
     res.status(201).json({
       status: true,
-      message: `please check your email to reset password http://localhost:1337/api/users/passwordreset/${updatedUser.username}/${pRC}`,
-      data: updatedUser,
+      message: `please check your email to reset password http://localhost:1337/api/users/passwordreset/${updatedUser.id}/${pRC}`,
     });
   } catch (error) {
     console.log(error);
@@ -117,11 +127,14 @@ export async function forgotPasswordHandler(req: Request, res: Response) {
   }
 }
 
-export async function passwordResetHandler(req: Request, res: Response) {
+export async function passwordResetHandler(
+  req: Request<resetPasswordInput["params"], {}, resetPasswordInput["body"]>,
+  res: Response
+) {
   try {
-    const { username, passwordresetcode } = req.params;
+    const { id, passwordresetcode } = req.params;
     const { password } = req.body;
-    const user = await findUserService(username);
+    const user = await findUserService(id);
     if (
       !user ||
       !user.passwordResetCode ||
@@ -130,8 +143,9 @@ export async function passwordResetHandler(req: Request, res: Response) {
       res.sendStatus(400);
       return;
     }
-    const updatedUser = await passwordResetService(username, password);
-    console.log("debugging ... - ", updatedUser.hashed_password, password);
+
+    const updatedUser = await passwordResetService(id, password);
+
     res.status(201).json({
       status: true,
       message: "password changed successfully",
