@@ -118,6 +118,7 @@ export async function forgotPasswordHandler(
       status: true,
       message: `please check your email to reset password http://localhost:1337/api/users/passwordreset/${updatedUser.id}/${pRC}`,
     });
+    return;
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -156,6 +157,18 @@ export async function passwordResetHandler(
     res.status(500).json({
       status: false,
       message: "server error",
+    });
+  }
+}
+
+export async function getCurrentUserHandler(req: Request, res: Response) {
+  try {
+    res.status(201).send(res.locals.user);
+  } catch (error) {
+    res.status(500).json({
+      status: false,
+      message: "server error",
+      error: error,
     });
   }
 }

@@ -20,16 +20,16 @@ model User {
   id                  String    @id @default(uuid())
   email               String    @unique
   username            String    @unique
-  hashed_password     String?
-  first_name          String?
-  last_name           String?
-  address             String?
-  address2            String
+  hashed_password     String
+  first_name          String
+  last_name           String
+  address             String
+  address2            String?
   city                String?
   country             String?
   verificationCode    String?
   passwordResetCode   String?
-  is_email_verified   Boolean?  @default(false)
+  is_email_verified   Boolean   @default(false)
   password_changed_at DateTime?
   createdAt           DateTime  @default(now())
   updatedAt           DateTime? @updatedAt

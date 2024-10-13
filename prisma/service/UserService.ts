@@ -1,14 +1,20 @@
+import { omit } from "lodash";
 import { prisma } from "../../script";
-import { forgotBody, userInput, verifyParam } from "../schema/UserSchema";
+import {
+  forgotBody,
+  userInput,
+  userService,
+  verifyParam,
+} from "../schema/UserSchema";
 import { comparePassword, hashPassword } from "../utils/hashPassword";
 
-export async function createUserService(
-  input: Omit<userInput, "confirm_password">
-) {
+export async function createUserService(input: userService) {
+  console.log(input);
   const newpassword = await hashPassword(input.hashed_password);
+  const newPayload = omit(input, "confirm_password");
   const user = await prisma.user.create({
     data: {
-      ...input,
+      ...newPayload,
       hashed_password: newpassword,
     },
   });

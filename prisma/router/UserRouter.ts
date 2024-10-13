@@ -9,6 +9,7 @@ import {
 import {
   CreateUserHandler,
   forgotPasswordHandler,
+  getCurrentUserHandler,
   passwordResetHandler,
   verifyUserHandler,
 } from "../controller/UserController";
@@ -36,6 +37,6 @@ router.post(
   validateResource(resetPasswordSchema),
   passwordResetHandler
 );
-router.post("/api/user/me", CreateUserHandler);
+router.get("/api/user/me", getCurrentUserHandler);
 
 export default router;
