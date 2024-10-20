@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 import {
   createUserService,
   findEmailService,
@@ -6,21 +6,19 @@ import {
   forgotUserService,
   passwordResetService,
   verifyUserService,
-} from "../service/UserService";
+} from '../service/UserService';
 import {
   createUserInput,
-  forgotBody,
   forgotPasswordInput,
   resetPasswordInput,
-  verifyParam,
   verifyUserInput,
-} from "../schema/UserSchema";
-import { v4 } from "uuid";
-import sendEmail from "../utils/sendEmail";
+} from '../schema/UserSchema';
+import { v4 } from 'uuid';
+import sendEmail from '../utils/sendEmail';
 
 export async function CreateUserHandler(
-  req: Request<{}, {}, createUserInput["body"]>,
-  res: Response
+  req: Request<{}, {}, createUserInput['body']>,
+  res: Response,
 ) {
   try {
     const body = req.body;
@@ -32,7 +30,7 @@ export async function CreateUserHandler(
     await sendEmail({
       from: `"Jobby Recruitment Platform 👻" <lakabosch@gmail.com>`,
       to: user.email,
-      subject: "Kindly verify your email ✔",
+      subject: 'Kindly verify your email ✔',
       text: `click on the link http://localhost:1337/api/users/verify/${user.id}/${user.verificationCode}`,
       html: `<b>Hello, click on the link http://localhost:1337/api/users/verify/${user.id}/${user.verificationCode}</b>`,
     });
@@ -46,60 +44,60 @@ export async function CreateUserHandler(
     console.log(error);
     res.status(500).json({
       status: false,
-      message: "server error",
+      message: 'server error',
     });
   }
 }
 
 export async function verifyUserHandler(
-  req: Request<verifyUserInput["params"]>,
-  res: Response
+  req: Request<verifyUserInput['params']>,
+  res: Response,
 ) {
   try {
     const { id, verificationcode } = req.params;
     console.log(id);
     const user = await findUserService(id);
     if (!user) {
-      res.send("could not find user");
+      res.send('could not find user');
       return;
     }
     if (user.is_email_verified) {
-      res.send("user already verified");
+      res.send('user already verified');
       return;
     }
 
     if (user.verificationCode === verificationcode) {
       await verifyUserService(id);
 
-      res.status(201).send("user successfully verified");
+      res.status(201).send('user successfully verified');
       return;
     }
     res.status(201).json({
       status: true,
-      message: "User now verified",
+      message: 'User now verified',
     });
   } catch (error) {
     console.log(error);
     res.status(500).json({
       status: false,
-      message: "server error",
+      message: 'server error',
     });
   }
 }
 
 export async function forgotPasswordHandler(
-  req: Request<{}, {}, forgotPasswordInput["body"]>,
-  res: Response
+  req: Request<{}, {}, forgotPasswordInput['body']>,
+  res: Response,
 ) {
   try {
     const { email } = req.body;
     const user = await findEmailService(email);
     if (!user) {
-      res.send("could not find user");
+      res.send('could not find user');
       return;
     }
     if (!user.is_email_verified) {
-      res.send("please verify first");
+      res.send('please verify first');
       return;
     }
     const pRC = v4();
@@ -107,10 +105,10 @@ export async function forgotPasswordHandler(
     await sendEmail({
       from: `"Jobby Recruitment Platform 👻" <lakabosch@gmail.com>`,
       to: user.email,
-      subject: "Kindly verify your email ✔",
+      subject: 'Kindly verify your email ✔',
       // text: `verification code: ${user.verificationCode}. username: ${user.username}`,
       text: `click on the link http://localhost:1337/api/users/passwordreset/${updatedUser.id}/${pRC}`,
-      html: "<b>Hello world?</b>",
+      html: '<b>Hello world?</b>',
     });
 
     // console.log
@@ -123,14 +121,14 @@ export async function forgotPasswordHandler(
     console.log(error);
     res.status(500).json({
       status: false,
-      message: "server error",
+      message: 'server error',
     });
   }
 }
 
 export async function passwordResetHandler(
-  req: Request<resetPasswordInput["params"], {}, resetPasswordInput["body"]>,
-  res: Response
+  req: Request<resetPasswordInput['params'], {}, resetPasswordInput['body']>,
+  res: Response,
 ) {
   try {
     const { id, passwordresetcode } = req.params;
@@ -149,25 +147,25 @@ export async function passwordResetHandler(
 
     res.status(201).json({
       status: true,
-      message: "password changed successfully",
+      message: 'password changed successfully',
       data: updatedUser,
     });
   } catch (error) {
     console.log(error);
     res.status(500).json({
       status: false,
-      message: "server error",
+      message: 'server error',
     });
   }
 }
 
-export async function getCurrentUserHandler(req: Request, res: Response) {
+export async function getCurrentUserHandler(_: Request, res: Response) {
   try {
     res.status(201).send(res.locals.user);
   } catch (error) {
     res.status(500).json({
       status: false,
-      message: "server error",
+      message: 'server error',
       error: error,
     });
   }

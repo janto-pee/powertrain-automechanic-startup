@@ -1,5 +1,5 @@
-import { NextFunction, Request, Response } from "express";
-import { AnyZodObject } from "zod/lib";
+import { NextFunction, Request, Response } from 'express';
+import { AnyZodObject } from 'zod/lib';
 
 const validateResource =
   (Schema: AnyZodObject) =>

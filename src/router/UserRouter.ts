@@ -1,42 +1,41 @@
-import express from "express";
-import validate from "../middleware/validate";
+import express from 'express';
 import {
   createUserSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
   verifyUserSchema,
-} from "../schema/UserSchema";
+} from '../schema/UserSchema';
 import {
   CreateUserHandler,
   forgotPasswordHandler,
   getCurrentUserHandler,
   passwordResetHandler,
   verifyUserHandler,
-} from "../controller/UserController";
-import validateResource from "../middleware/validate";
+} from '../controller/UserController';
+import validateResource from '../middleware/validate';
 
 const router = express.Router();
 
 router.post(
-  "/api/users",
+  '/api/users',
   validateResource(createUserSchema),
-  CreateUserHandler
+  CreateUserHandler,
 );
 router.get(
-  "/api/users/verify/:id/:verificationcode",
+  '/api/users/verify/:id/:verificationcode',
   validateResource(verifyUserSchema),
-  verifyUserHandler
+  verifyUserHandler,
 );
 router.post(
-  "/api/users/forgot-password",
+  '/api/users/forgot-password',
   validateResource(forgotPasswordSchema),
-  forgotPasswordHandler
+  forgotPasswordHandler,
 );
 router.post(
-  "/api/users/passwordreset/:id/:passwordresetcode",
+  '/api/users/passwordreset/:id/:passwordresetcode',
   validateResource(resetPasswordSchema),
-  passwordResetHandler
+  passwordResetHandler,
 );
-router.get("/api/user/me", getCurrentUserHandler);
+router.get('/api/user/me', getCurrentUserHandler);
 
 export default router;

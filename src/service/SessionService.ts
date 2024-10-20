@@ -1,8 +1,8 @@
-import { get } from "lodash";
-import { prisma } from "../../script";
-import { signJwt, verifyJwt } from "../utils/jwt";
-import { findUserService } from "./UserService";
-import config from "config";
+import { get } from 'lodash';
+import { prisma } from '../script';
+import { signJwt, verifyJwt } from '../utils/jwt';
+import { findUserService } from './UserService';
+import config from 'config';
 
 export async function createSession(input: any) {
   const session = await prisma.session.create({
@@ -34,11 +34,11 @@ export async function updateSession(query: string) {
 }
 
 export async function reIssueAccessToken(refreshToken: string) {
-  const { decoded } = verifyJwt(refreshToken, "refreshTokenPublic");
+  const { decoded } = verifyJwt(refreshToken, 'refreshTokenPublic');
 
-  if (!decoded || !get(decoded, "session")) return false;
+  if (!decoded || !get(decoded, 'session')) return false;
 
-  const session = await findSession(get(decoded, "session"));
+  const session = await findSession(get(decoded, 'session'));
 
   if (!session || !session.valid) return false;
 
@@ -48,8 +48,8 @@ export async function reIssueAccessToken(refreshToken: string) {
 
   const accessToken = signJwt(
     { ...user, session: session.id },
-    "accessTokenPrivate",
-    { expiresIn: config.get<string>("accessTokenTtl") }
+    'accessTokenPrivate',
+    { expiresIn: config.get<string>('accessTokenTtl') },
   );
 
   return accessToken;

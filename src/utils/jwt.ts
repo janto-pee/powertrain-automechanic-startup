@@ -1,16 +1,16 @@
-import jwt from "jsonwebtoken";
-import config from "config";
+import jwt from 'jsonwebtoken';
+import config from 'config';
 
 export function signJwt(
-  object: Object,
-  privateKey: "accessTokenPrivate" | "refreshTokenPrivate",
-  options?: jwt.SignOptions | undefined
+  object: object,
+  privateKey: 'accessTokenPrivate' | 'refreshTokenPrivate',
+  options?: jwt.SignOptions | undefined,
 ) {
   try {
     const signInKey = config.get<string>(privateKey);
     return jwt.sign(object, signInKey, {
       ...(options && options),
-      algorithm: "RS256",
+      algorithm: 'RS256',
     });
   } catch (error) {
     return error;
@@ -18,7 +18,7 @@ export function signJwt(
 }
 export function verifyJwt(
   token: string,
-  publicKey: "accessTokenPublic" | "refreshTokenPublic"
+  publicKey: 'accessTokenPublic' | 'refreshTokenPublic',
 ) {
   try {
     const signInKey = config.get<string>(publicKey);

@@ -1,17 +1,17 @@
-import { Request, Response } from "express";
-import { validateUser } from "../service/UserService";
+import { Request, Response } from 'express';
+import { validateUser } from '../service/UserService';
 import {
   createSession,
   findSession,
   updateSession,
-} from "../service/SessionService";
-import { signJwt } from "../utils/jwt";
-import config from "config";
-import { createSessionInput } from "../schema/SessionSchema";
+} from '../service/SessionService';
+import { signJwt } from '../utils/jwt';
+import config from 'config';
+import { createSessionInput } from '../schema/SessionSchema';
 
 export async function CreateSessionHandler(
-  req: Request<{}, {}, createSessionInput["body"]>,
-  res: Response
+  req: Request<{}, {}, createSessionInput['body']>,
+  res: Response,
 ) {
   try {
     const { email, hashed_password } = req.body;
@@ -23,7 +23,7 @@ export async function CreateSessionHandler(
       return;
     }
 
-    const userAgent = req.get("userAgent") || "";
+    const userAgent = req.get('userAgent') || '';
     const session = await createSession({
       userId: user.id,
       userAgent: userAgent,
@@ -33,14 +33,14 @@ export async function CreateSessionHandler(
     //   generate access and refresh token
     const accessToken = signJwt(
       { ...user, session: session.id },
-      "accessTokenPrivate",
-      { expiresIn: config.get<string>("accessTokenTtl") }
+      'accessTokenPrivate',
+      { expiresIn: config.get<string>('accessTokenTtl') },
     );
 
     const refreshToken = signJwt(
       { ...user, session: session.id },
-      "refreshTokenPrivate",
-      { expiresIn: config.get<string>("refreshTokenTtl") }
+      'refreshTokenPrivate',
+      { expiresIn: config.get<string>('refreshTokenTtl') },
     );
 
     res.status(200).send({
@@ -53,18 +53,18 @@ export async function CreateSessionHandler(
     console.log(error);
     res.status(500).json({
       status: false,
-      message: "server error",
+      message: 'server error',
     });
   }
 }
 
-export async function findSessionHandler(req: Request, res: Response) {
+export async function findSessionHandler(_: Request, res: Response) {
   try {
     const id = res.locals.user.session;
     const session = await findSession(id);
     res.status(201).json({
       status: true,
-      message: "session found",
+      message: 'session found',
       data: session,
     });
     return;
@@ -72,25 +72,25 @@ export async function findSessionHandler(req: Request, res: Response) {
     console.log(error);
     res.status(500).json({
       status: false,
-      message: "server error",
+      message: 'server error',
     });
   }
 }
 
-export async function deleteSessionHandler(req: Request, res: Response) {
+export async function deleteSessionHandler(_: Request, res: Response) {
   try {
     const id = res.locals.user.id;
     const user = await updateSession(id);
     res.status(201).json({
       status: true,
-      message: "session expired",
+      message: 'session expired',
       data: user,
     });
   } catch (error) {
     console.log(error);
     res.status(500).json({
       status: false,
-      message: "server error",
+      message: 'server error',
     });
   }
 }
